@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DataHarvest — Web Scraper</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+
+  <!-- Grid background -->
+  <div class="grid-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="logo">
+      <span class="logo-icon">⬡</span>
+      <span class="logo-text">Data<strong>Harvest</strong></span>
+    </div>
+    <nav class="header-nav">
+      <a href="#how-it-works">How it works</a>
+      <a href="#examples">Examples</a>
+      <a href="/api/health" target="_blank">API</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Hero -->
+    <section class="hero">
+      <div class="hero-tag">Web Scraping → Datasets</div>
+      <h1 class="hero-title">
+        Turn any<br/>
+        webpage into<br/>
+        <span class="accent">structured data.</span>
+      </h1>
+      <p class="hero-sub">
+        Point DataHarvest at any URL. Pick your HTML elements.
+        Download a clean CSV or JSON ready for ML and analysis.
+      </p>
+    </section>
+
+    <!-- Flash messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-container">
+          {% for cat, msg in messages %}
+            <div class="flash flash--{{ cat }}">
+              <span>{{ msg }}</span>
+              <button class="flash-close" onclick="this.parentElement.remove()">✕</button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Scraper Form -->
+    <section class="form-section">
+      <div class="form-card">
+        <div class="form-card__header">
+          <h2>Configure Scrape</h2>
+          <span class="badge">v1.0</span>
+        </div>
+
+        <form action="/scrape" method="POST" id="scrapeForm">
+
+          <!-- URL -->
+          <div class="field">
+            <label for="url">Target URL <span class="required">*</span></label>
+            <div class="input-wrap">
+              <span class="input-icon">🌐</span>
+              <input
+                type="text"
+                id="url"
+                name="url"
+                placeholder="https://books.toscrape.com"
+                required
+                autocomplete="off"
+              />
+            </div>
+            <small>Any publicly accessible webpage</small>
+          </div>
+
+          <!-- Tag + Class row -->
+          <div class="field-row">
+            <div class="field">
+              <label for="tag">HTML Tag <span class="required">*</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">&lt;/&gt;</span>
+                <input type="text" id="tag" name="tag" placeholder="h2, p, div, span, a…" value="p" />
+              </div>
+              <small>Element type to extract</small>
+            </div>
+            <div class="field">
+              <label for="class_name">CSS Class <span class="optional">(optional)</span></label>
+              <div class="input-wrap">
+                <span class="input-icon">.</span>
+                <input type="text" id="class_name" name="class_name" placeholder="product-title, price…" />
+              </div>
+              <small>Filter by class name</small>
+            </div>
+          </div>
+
+          <!-- Pages + Images row -->
+          <div class="field-row">
+            <div class="field">
+              <label for="max_pages">Max Pages</label>
+              <div class="input-wrap">
+                <span class="input-icon">#</span>
+                <input type="number" id="max_pages" name="max_pages" min="1" max="5" value="1" />
+              </div>
+              <small>Follow pagination (max 5)</small>
+            </div>
+            <div class="field field--center">
+              <label>Options</label>
+              <label class="toggle">
+                <input type="checkbox" name="scrape_images" id="scrape_images" />
+                <span class="toggle__track"></span>
+                <span class="toggle__label">Download images</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Submit -->
+          <button type="submit" class="btn-scrape" id="submitBtn">
+            <span class="btn-text">Start Scraping</span>
+            <span class="btn-spinner" hidden>
+              <span class="spinner"></span> Harvesting…
+            </span>
+          </button>
+
+        </form>
+      </div>
+
+      <!-- Quick-fill chips -->
+      <div class="quickfill">
+        <span class="quickfill__label">Try:</span>
+        <button class="chip" data-url="https://books.toscrape.com" data-tag="h3" data-class="">📚 Book titles</button>
+        <button class="chip" data-url="https://quotes.toscrape.com" data-tag="span" data-class="text">💬 Quotes</button>
+        <button class="chip" data-url="https://news.ycombinator.com" data-tag="span" data-class="titleline">🔖 HN titles</button>
+        <button class="chip" data-url="https://realpython.com" data-tag="h2" data-class="">🐍 Articles</button>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="how-section" id="how-it-works">
+      <h2 class="section-title">How it works</h2>
+      <div class="steps">
+        <div class="step">
+          <div class="step__num">01</div>
+          <h3>Enter URL</h3>
+          <p>Paste any public webpage URL into the form above.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">02</div>
+          <h3>Pick elements</h3>
+          <p>Specify the HTML tag and optional class to target.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">03</div>
+          <h3>Scrape & clean</h3>
+          <p>DataHarvest fetches, parses, deduplicates, and structures the data.</p>
+        </div>
+        <div class="step">
+          <div class="step__num">04</div>
+          <h3>Download</h3>
+          <p>Export as CSV or JSON — ready for Pandas, sklearn, or any ML pipeline.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- REST API note -->
+    <section class="api-section" id="examples">
+      <h2 class="section-title">REST API</h2>
+      <div class="code-block">
+        <pre><code>POST /api/scrape
+Content-Type: application/json
+
+{
+  "url":          "https://quotes.toscrape.com",
+  "tag":          "span",
+  "class_name":   "text",
+  "max_pages":    2,
+  "scrape_images": false
+}</code></pre>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <span>DataHarvest — Web Scraper for Dataset Creation</span>
+  </footer>
+
+  <script>
+    // Quick-fill chips
+    document.querySelectorAll('.chip').forEach(chip => {
+      chip.addEventListener('click', () => {
+        document.getElementById('url').value        = chip.dataset.url;
+        document.getElementById('tag').value        = chip.dataset.tag;
+        document.getElementById('class_name').value = chip.dataset.class;
+      });
+    });
+
+    // Show spinner on submit
+    document.getElementById('scrapeForm').addEventListener('submit', () => {
+      const btn   = document.getElementById('submitBtn');
+      const text  = btn.querySelector('.btn-text');
+      const spin  = btn.querySelector('.btn-spinner');
+      text.hidden = true;
+      spin.hidden = false;
+      btn.disabled = true;
+    });
+  </script>
+</body>
+</html>

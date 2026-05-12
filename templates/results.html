@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Results — DataHarvest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}" />
+</head>
+<body>
+
+  <div class="grid-bg" aria-hidden="true"></div>
+
+  <header class="site-header">
+    <div class="logo">
+      <a href="/" style="text-decoration:none;color:inherit;display:flex;align-items:center;gap:.5rem">
+        <span class="logo-icon">⬡</span>
+        <span class="logo-text">Data<strong>Harvest</strong></span>
+      </a>
+    </div>
+    <a href="/" class="btn-back">← New Scrape</a>
+  </header>
+
+  <main>
+    <!-- Summary bar -->
+    <section class="results-summary">
+      <div class="summary-stat">
+        <span class="stat-val">{{ total }}</span>
+        <span class="stat-key">Records</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-val">{{ pages_scraped }}</span>
+        <span class="stat-key">Pages scraped</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-val">{{ images | length }}</span>
+        <span class="stat-key">Images found</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-val accent">{{ tag }}</span>
+        <span class="stat-key">Tag</span>
+      </div>
+      {% if class_name %}
+      <div class="summary-stat">
+        <span class="stat-val accent">.{{ class_name }}</span>
+        <span class="stat-key">Class</span>
+      </div>
+      {% endif %}
+
+      <!-- Download button -->
+      {% if file_paths.csv %}
+      <a href="/download" class="btn-download">
+        ⬇ Download CSV
+      </a>
+      {% endif %}
+    </section>
+
+    <!-- Source URL -->
+    <div class="source-url">
+      Source: <a href="{{ url }}" target="_blank" rel="noopener">{{ url }}</a>
+    </div>
+
+    <!-- Errors -->
+    {% if errors %}
+    <div class="errors-box">
+      <strong>Warnings:</strong>
+      <ul>
+        {% for e in errors %}<li>{{ e }}</li>{% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <!-- Search / filter bar -->
+    <div class="table-toolbar">
+      <input type="search" id="tableSearch" placeholder="Filter results…" />
+      <span class="table-count" id="tableCount">Showing {{ records | length }} of {{ total }}</span>
+    </div>
+
+    <!-- Results table -->
+    {% if records %}
+    <div class="table-wrap">
+      <table class="data-table" id="dataTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Text</th>
+            <th>Tag</th>
+            <th>Class</th>
+            <th>HREF</th>
+            <th>Page</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for rec in records %}
+          <tr>
+            <td class="mono">{{ loop.index }}</td>
+            <td class="cell-text">{{ rec.text[:200] }}{% if rec.text|length > 200 %}…{% endif %}</td>
+            <td><code>{{ rec.tag }}</code></td>
+            <td class="mono small">{{ rec.class[:40] if rec.class else '—' }}</td>
+            <td class="cell-link">
+              {% if rec.href %}
+              <a href="{{ rec.href }}" target="_blank" rel="noopener" title="{{ rec.href }}">link ↗</a>
+              {% else %}—{% endif %}
+            </td>
+            <td class="mono">{{ rec.page }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {% if total > 500 %}
+    <p class="table-note">Displaying first 500 of {{ total }} records. Download the CSV for the full dataset.</p>
+    {% endif %}
+
+    {% else %}
+    <div class="empty-state">
+      <span>🔍</span>
+      <p>No records found for <code>&lt;{{ tag }}&gt;</code>{% if class_name %} .{{ class_name }}{% endif %}.</p>
+      <p>Try a different tag or class name.</p>
+      <a href="/" class="btn-back" style="margin-top:1rem">← Try again</a>
+    </div>
+    {% endif %}
+
+    <!-- Images section -->
+    {% if images %}
+    <section class="images-section">
+      <h2 class="section-title">Images found ({{ images | length }})</h2>
+      <div class="image-grid">
+        {% for img in images[:24] %}
+        <div class="img-card">
+          <img src="{{ img.url }}" alt="{{ img.alt }}" loading="lazy" onerror="this.closest('.img-card').style.display='none'" />
+          {% if img.alt %}<p class="img-alt">{{ img.alt[:60] }}</p>{% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    <!-- File paths -->
+    {% if file_paths %}
+    <section class="file-paths">
+      <h3>Saved files</h3>
+      {% for kind, path in file_paths.items() %}
+      <div class="file-entry">
+        <span class="file-badge">{{ kind.upper() }}</span>
+        <code>{{ path }}</code>
+      </div>
+      {% endfor %}
+    </section>
+    {% endif %}
+  </main>
+
+  <footer class="site-footer">
+    <span>DataHarvest — Web Scraper for Dataset Creation</span>
+  </footer>
+
+  <script>
+    // Client-side table filter
+    const search = document.getElementById('tableSearch');
+    const count  = document.getElementById('tableCount');
+    const rows   = document.querySelectorAll('#dataTable tbody tr');
+
+    search.addEventListener('input', () => {
+      const q   = search.value.toLowerCase();
+      let visible = 0;
+      rows.forEach(r => {
+        const match = r.textContent.toLowerCase().includes(q);
+        r.hidden = !match;
+        if (match) visible++;
+      });
+      count.textContent = `Showing ${visible} of {{ total }}`;
+    });
+  </script>
+</body>
+</html>

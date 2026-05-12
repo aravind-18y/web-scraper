@@ -1,0 +1,6 @@
+2026-03-27 16:28:48,037 [INFO] Scraping page 1: https://quotes.toscrape.com
+2026-03-27 16:28:48,043 [ERROR] Connection error fetching https://quotes.toscrape.com
+2026-03-27 16:28:48,043 [INFO] Done. 0 records (0 duplicates removed) across 0 page(s).
+2026-03-27 16:29:00,822 [INFO] Scraping page 1: https://not-a-real-url-xyz
+2026-03-27 16:29:00,828 [ERROR] Connection error fetching https://not-a-real-url-xyz
+2026-03-27 16:29:00,828 [INFO] Done. 0 records (0 duplicates removed) across 0 page(s).
