@@ -139,3 +139,6 @@ Content-Type: application/json
 - **BeautifulSoup4 + lxml** — HTML parsing
 - **pandas** — data structuring & CSV export
 - **python-dotenv** — `.env` loading
+
+- ## Live website link
+- -- https://web-scraper-cjiv.onrender.com/
