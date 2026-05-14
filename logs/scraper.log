@@ -4,3 +4,12 @@
 2026-03-27 16:29:00,822 [INFO] Scraping page 1: https://not-a-real-url-xyz
 2026-03-27 16:29:00,828 [ERROR] Connection error fetching https://not-a-real-url-xyz
 2026-03-27 16:29:00,828 [INFO] Done. 0 records (0 duplicates removed) across 0 page(s).
+2026-05-13 11:12:18,385 [INFO] [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5000
+2026-05-13 11:12:18,386 [INFO] [33mPress CTRL+C to quit[0m
+2026-05-13 11:12:18,391 [INFO]  * Restarting with stat
+2026-05-13 11:12:21,123 [WARNING]  * Debugger is active!
+2026-05-13 11:12:21,138 [INFO]  * Debugger PIN: 807-413-565
+2026-05-13 11:12:24,639 [INFO] 127.0.0.1 - - [13/May/2026 11:12:24] "GET / HTTP/1.1" 200 -
+2026-05-13 11:12:24,882 [INFO] 127.0.0.1 - - [13/May/2026 11:12:24] "GET /static/styles.css HTTP/1.1" 200 -
+2026-05-13 11:12:25,659 [INFO] 127.0.0.1 - - [13/May/2026 11:12:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
